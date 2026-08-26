@@ -13,9 +13,7 @@ A modern Python repository built from scratch for simulating, analyzing, and vis
 - **Neighborhood Movement Patterns**:
   - **von Neumann**: 4 axis-aligned directions (up, down, left, right).
   - **Moore**: 8 directions including diagonals.
-- **Custom Color Palette**: Automatic or custom color assignment per walker for clear visualization.
-- **Data Export**: Export trajectory data to pandas DataFrames and CSV files.
-- **Plotting**: Matplotlib 2D trajectory plots with start (O) and end (X) markers.
+- **Automated Output Storage**: Outputs are automatically stored inside an `output/` directory (CSV data & Matplotlib plot PNGs).
 - **Multiple Runs**: Option to automatically run simulations multiple times and export plots and CSVs for each run.
 
 ---
@@ -29,6 +27,8 @@ random_walk/
 ├── requirements.txt           # Package dependencies
 ├── pyproject.toml             # Build configuration
 ├── main.py                    # Main executable script
+├── output/                    # Folder where generated CSV and plot outputs are stored
+│   └── .gitkeep
 ├── src/
 │   └── random_walk/
 │       ├── __init__.py        # Package exports
@@ -56,16 +56,16 @@ pip install -e .
 
 ### 1. Command Line Interface (CLI)
 
-Run a 2D simulation with 5 walkers, randomized speeds, and randomized starting points:
+Run a 2D simulation with 5 walkers (outputs will be automatically saved to `output/data.csv` and `output/plot.png`):
 
 ```bash
-python main.py -w 5 -s 100 -n moore --random-start --random-speed --output-csv data.csv --output-plot plot.png
+python main.py -w 5 -s 100 -n moore --random-start --random-speed
 ```
 
-Run 3 simulation runs automatically:
+Specify a custom output directory or filename:
 
 ```bash
-python main.py -w 4 -s 50 --runs 3 --output-csv run.csv --output-plot run.png
+python main.py -w 5 -s 100 --output-dir my_results --output-csv trajectory.csv --output-plot walk.png
 ```
 
 #### CLI Options Summary
@@ -79,8 +79,9 @@ python main.py -w 4 -s 50 --runs 3 --output-csv run.csv --output-plot run.png
 | `--random-speed` | Randomize walker speeds | `False` |
 | `--runs` | Number of simulation runs to execute | `1` |
 | `--seed` | Random number generator seed | `None` |
-| `--output-csv` | Filepath to export CSV data | `None` |
-| `--output-plot` | Filepath to save plot image | `None` |
+| `--output-dir` | Directory where output files are stored | `output` |
+| `--output-csv` | Filename or path to export CSV data | `data.csv` |
+| `--output-plot` | Filename or path to save plot image | `plot.png` |
 
 ---
 
@@ -98,11 +99,11 @@ sim.create_walkers(num_walkers=5, random_starts=True, random_speeds=True)
 # 3. Execute 100 steps
 sim.run(num_steps=100)
 
-# 4. Save results to CSV
-sim.save_csv("trajectory_data.csv")
+# 4. Save results to CSV in output directory
+sim.save_csv("output/trajectory_data.csv")
 
 # 5. Plot trajectories
-plot_walks(sim, save_path="random_walk_plot.png", show=True)
+plot_walks(sim, save_path="output/random_walk_plot.png", show=True)
 ```
 
 ---

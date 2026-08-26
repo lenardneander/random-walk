@@ -1,3 +1,4 @@
+import os
 from typing import Optional
 import matplotlib.pyplot as plt
 
@@ -42,7 +43,9 @@ def plot_walks(
     plt.tight_layout()
 
     if save_path:
-        plt.savefig(save_path, dpi=300, bbox_inches="tight")
+        abs_path = os.path.abspath(save_path)
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
+        plt.savefig(abs_path, dpi=300, bbox_inches="tight")
 
     if show:
         plt.show()

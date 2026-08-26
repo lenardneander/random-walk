@@ -20,14 +20,11 @@ wheels/
 .installed.cfg
 *.egg
 
-# Virtual environments
-venv/
-env/
-ENV/
+# Output files
+output/*
+!output/.gitkeep
 
-# Output test files
-output.csv
-output3d.csv
-walk.png
-walk3d.png
+# System / IDE
 .DS_Store
+data.csv
+plot.png

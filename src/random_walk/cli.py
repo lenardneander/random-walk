@@ -1,4 +1,5 @@
 import argparse
+import os
 from .simulation import Simulation, NeighborhoodType
 from .visualization import plot_walks
 
@@ -16,12 +17,14 @@ def main():
     parser.add_argument("--random-speed", action="store_true", help="Randomize walker speeds")
     parser.add_argument("--runs", type=int, default=1, help="Number of simulation runs to execute")
     parser.add_argument("--seed", type=int, default=None, help="Random number generator seed")
-    parser.add_argument("--output-csv", type=str, default=None, help="File path to export trajectory CSV data")
-    parser.add_argument("--output-plot", type=str, default=None, help="File path to save trajectory plot image")
+    parser.add_argument("--output-dir", type=str, default="output", help="Directory where generated output files are stored")
+    parser.add_argument("--output-csv", type=str, default=None, help="Filename or path to export trajectory CSV data")
+    parser.add_argument("--output-plot", type=str, default=None, help="Filename or path to save trajectory plot image")
     parser.add_argument("--no-show", action="store_true", help="Do not display plot interactively")
 
     args = parser.parse_args()
 
+    os.makedirs(args.output_dir, exist_ok=True)
     n_type = NeighborhoodType.VON_NEUMANN if args.neighborhood == "von_neumann" else NeighborhoodType.MOORE
 
     for run_idx in range(args.runs):
@@ -46,17 +49,20 @@ def main():
             disp = s["displacement"]
             print(f"  Walker {w_id}: Start={start_p}, End={final_p}, Speed={speed:.2f}, Displacement={disp:.2f}")
 
-        csv_path = args.output_csv
-        if csv_path and args.runs > 1:
-            csv_path = f"run_{run_idx + 1}_{csv_path}"
+        # Determine CSV output path
+        csv_filename = args.output_csv or "data.csv"
+        if args.runs > 1:
+            csv_filename = f"run_{run_idx + 1}_{csv_filename}"
+        csv_path = os.path.join(args.output_dir, os.path.basename(csv_filename)) if not os.path.isabs(csv_filename) else csv_filename
 
-        if csv_path:
-            sim.save_csv(csv_path)
-            print(f"Data saved to CSV: {csv_path}")
+        sim.save_csv(csv_path)
+        print(f"Data saved to CSV: {csv_path}")
 
-        plot_path = args.output_plot
-        if plot_path and args.runs > 1:
-            plot_path = f"run_{run_idx + 1}_{plot_path}"
+        # Determine Plot output path
+        plot_filename = args.output_plot or "plot.png"
+        if args.runs > 1:
+            plot_filename = f"run_{run_idx + 1}_{plot_filename}"
+        plot_path = os.path.join(args.output_dir, os.path.basename(plot_filename)) if not os.path.isabs(plot_filename) else plot_filename
 
         plot_walks(sim, save_path=plot_path, show=not args.no_show)
 

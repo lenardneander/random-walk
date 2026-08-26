@@ -1,6 +1,7 @@
 from enum import Enum, auto
 from typing import List, Optional, Union, Dict, Any
 import itertools
+import os
 import numpy as np
 import pandas as pd
 
@@ -64,7 +65,6 @@ class Simulation:
         for i in range(num_walkers):
             w_id = i + 1
 
-            # Determine position
             if random_starts:
                 pos = self.rng.uniform(-random_start_range, random_start_range, size=2)
             elif start_positions is not None:
@@ -72,7 +72,6 @@ class Simulation:
             else:
                 pos = np.array([0.0, 0.0], dtype=float)
 
-            # Determine speed
             if random_speeds:
                 speed = float(self.rng.uniform(speed_range[0], speed_range[1]))
             elif speeds is not None and i < len(speeds):
@@ -80,7 +79,6 @@ class Simulation:
             else:
                 speed = 1.0
 
-            # Determine color
             color = colors[i] if (colors is not None and i < len(colors)) else palette[i % len(palette)]
 
             w = Walker(walker_id=w_id, initial_position=pos, speed=speed, color=color)
@@ -118,8 +116,10 @@ class Simulation:
         return pd.DataFrame(rows)
 
     def save_csv(self, filepath: str) -> None:
+        abs_path = os.path.abspath(filepath)
+        os.makedirs(os.path.dirname(abs_path), exist_ok=True)
         df = self.to_dataframe()
-        df.to_csv(filepath, index=False)
+        df.to_csv(abs_path, index=False)
 
     def get_summary(self) -> List[Dict[str, Any]]:
         """Calculates summary statistics for all walkers."""
