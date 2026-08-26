@@ -1,6 +1,6 @@
 # Random Walk Simulation
 
-A modern, modular Python repository built from scratch for simulating, analyzing, and visualizing random walks in 2D and 3D.
+A modern Python repository built from scratch for simulating, analyzing, and visualizing 2D random walks.
 
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](https://opensource.org/licenses/MIT)
 
@@ -8,17 +8,15 @@ A modern, modular Python repository built from scratch for simulating, analyzing
 
 ## Features
 
-- **2D and 3D Simulation**: Full support for both 2D planar and 3D spatial random walk trajectories.
+- **Multi-Walker Simulation**: Simulate multiple random walkers simultaneously.
+- **Speed & Starting Point Randomization**: Support for custom or randomized walker speeds and initial starting positions.
 - **Neighborhood Movement Patterns**:
-  - **von Neumann**: Axis-aligned steps (4 directions in 2D, 6 directions in 3D).
-  - **Moore**: Extended grid steps including diagonals (8 directions in 2D, 26 directions in 3D).
-- **Custom Boundary Conditions**:
-  - `INFINITE`: Unbounded grid space.
-  - `REFLECTIVE`: Elastic rebound off user-specified rectangular or cubic bounding boxes.
-  - `ABSORBING`: Walker terminates/freezes upon contact with boundary box.
-- **Multi-Walker Simulations**: Run multiple independent walkers with variable speeds, colors, and initial positions (origin or randomized).
-- **Data Export**: Export trajectory history to pandas DataFrames and CSV files.
-- **Visualization**: Beautiful Matplotlib 2D and 3D path plots with start/end markers and boundary outlines.
+  - **von Neumann**: 4 axis-aligned directions (up, down, left, right).
+  - **Moore**: 8 directions including diagonals.
+- **Custom Color Palette**: Automatic or custom color assignment per walker for clear visualization.
+- **Data Export**: Export trajectory data to pandas DataFrames and CSV files.
+- **Plotting**: Matplotlib 2D trajectory plots with start (O) and end (X) markers.
+- **Multiple Runs**: Option to automatically run simulations multiple times and export plots and CSVs for each run.
 
 ---
 
@@ -30,15 +28,14 @@ random_walk/
 ├── README.md                  # Documentation
 ├── requirements.txt           # Package dependencies
 ├── pyproject.toml             # Build configuration
-├── main.py                    # Main executable entry script
+├── main.py                    # Main executable script
 ├── src/
 │   └── random_walk/
 │       ├── __init__.py        # Package exports
-│       ├── boundaries.py      # Boundary logic (Infinite, Reflective, Absorbing)
 │       ├── walker.py          # Walker class & trajectory tracker
-│       ├── simulation.py      # Simulation manager & step generation
-│       ├── visualization.py   # Matplotlib 2D/3D plotting routines
-│       └── cli.py             # Command line interface parser
+│       ├── simulation.py      # Simulation manager & step generator
+│       ├── visualization.py   # Matplotlib 2D plotting module
+│       └── cli.py             # Command Line Interface
 └── tests/
     └── test_simulation.py     # Unit test suite
 ```
@@ -46,12 +43,6 @@ random_walk/
 ---
 
 ## Installation
-
-### Prerequisites
-- Python 3.8+
-- numpy, matplotlib, pandas
-
-### Setup
 
 ```bash
 cd Documents/DataAnnotation/random_walk
@@ -65,58 +56,60 @@ pip install -e .
 
 ### 1. Command Line Interface (CLI)
 
-Run a 2D simulation with 5 walkers and reflective boundaries:
+Run a 2D simulation with 5 walkers, randomized speeds, and randomized starting points:
 
 ```bash
-python main.py -d 2 -w 5 -s 100 -n moore -b reflective --output-csv data.csv --output-plot plot.png
+python main.py -w 5 -s 100 -n moore --random-start --random-speed --output-csv data.csv --output-plot plot.png
 ```
 
-Run a 3D simulation with absorbing boundaries:
+Run 3 simulation runs automatically:
 
 ```bash
-python main.py -d 3 -w 3 -s 150 -n von_neumann -b absorbing --box-size 15 --output-csv 3d_data.csv --output-plot 3d_plot.png
+python main.py -w 4 -s 50 --runs 3 --output-csv run.csv --output-plot run.png
 ```
+
+#### CLI Options Summary
+
+| Option | Description | Default |
+| :--- | :--- | :--- |
+| `-w`, `--num-walkers` | Number of random walkers | `5` |
+| `-s`, `--num-steps` | Number of steps per walker | `100` |
+| `-n`, `--neighborhood` | Neighborhood pattern (`von_neumann` or `moore`) | `von_neumann` |
+| `--random-start` | Randomize initial starting positions | `False` |
+| `--random-speed` | Randomize walker speeds | `False` |
+| `--runs` | Number of simulation runs to execute | `1` |
+| `--seed` | Random number generator seed | `None` |
+| `--output-csv` | Filepath to export CSV data | `None` |
+| `--output-plot` | Filepath to save plot image | `None` |
 
 ---
 
 ### 2. Python API Usage
 
 ```python
-from random_walk import Simulation, Boundary, BoundaryType, NeighborhoodType, plot_walks
+from random_walk import Simulation, NeighborhoodType, plot_walks
 
-# 1. Configure boundaries
-boundary = Boundary(
-    dimension=3,
-    boundary_type=BoundaryType.REFLECTIVE,
-    limits=[(-10.0, 10.0), (-10.0, 10.0), (-10.0, 10.0)]
-)
+# 1. Initialize simulation with Moore neighborhood (8 directions)
+sim = Simulation(neighborhood_type=NeighborhoodType.MOORE, seed=42)
 
-# 2. Initialize simulation
-sim = Simulation(
-    dimension=3,
-    neighborhood_type=NeighborhoodType.MOORE,
-    boundary=boundary,
-    seed=42
-)
+# 2. Create walkers with randomized speeds and starting points
+sim.create_walkers(num_walkers=5, random_starts=True, random_speeds=True)
 
-# 3. Add walkers
-sim.create_walkers(num_walkers=4)
-
-# 4. Execute simulation steps
+# 3. Execute 100 steps
 sim.run(num_steps=100)
 
-# 5. Export data to CSV
-sim.save_csv("trajectory_results.csv")
+# 4. Save results to CSV
+sim.save_csv("trajectory_data.csv")
 
-# 6. Plot trajectories
-plot_walks(sim, save_path="trajectory_plot.png", show=True)
+# 5. Plot trajectories
+plot_walks(sim, save_path="random_walk_plot.png", show=True)
 ```
 
 ---
 
 ## Running Tests
 
-Execute unit tests with unittest:
+Execute unit tests:
 
 ```bash
 python -m unittest discover -s tests -p "test_*.py"
