@@ -1,0 +1,25 @@
+[build-system]
+requires = ["setuptools>=61.0"]
+build-backend = "setuptools.build_meta"
+
+[project]
+name = "random_walk"
+version = "0.1.0"
+description = "A modular 2D and 3D random walk simulation package with custom boundaries, neighborhoods, and visualizations."
+readme = "README.md"
+requires-python = ">=3.8"
+license = {file = "LICENSE"}
+authors = [
+    {name = "DataAnnotation User"}
+]
+dependencies = [
+    "numpy>=1.20.0",
+    "matplotlib>=3.4.0",
+    "pandas>=1.2.0"
+]
+
+[project.scripts]
+random-walk = "random_walk.cli:main"
+
+[tool.setuptools.packages.find]
+where = ["src"]
